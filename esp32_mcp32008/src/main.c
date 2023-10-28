@@ -114,7 +114,7 @@ void app_main() {
 
   while (1) {
 
-    double Irms_main = calcIrms_with_mcp3208(100);
+    double Irms_main = calcIrms_with_mcp3208(10);
     ESP_LOGI("mcp320x", "Current: %f mA", Irms_main);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
