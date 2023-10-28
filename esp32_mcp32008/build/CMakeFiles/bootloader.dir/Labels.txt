@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader
+H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader.rule
+H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader-complete.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

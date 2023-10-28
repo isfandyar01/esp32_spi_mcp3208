@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "H:/esp32_ads_1115/esp32_ads1115/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

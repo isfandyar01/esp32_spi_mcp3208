@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "freertos.h": "c",
+        "numeric": "c"
+    },
+    "idf.adapterTargetName": "esp32",
+    "idf.portWin": "COM6",
+    "idf.flashType": "UART"
+}
