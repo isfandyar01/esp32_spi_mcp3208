@@ -75,7 +75,7 @@ static uint16_t spi_read() {
   trans_desc.tx_data[1] = (uint8_t)(MCP320X_CHANNEL_0 << 6);
   trans_desc.tx_data[2] = 0;
 
-  for (uint16_t i = 0; i < 3000; i++) {
+  for (uint16_t i = 0; i <= 1; i++) {
     esp_err_t error = spi_device_polling_transmit(spi2, &trans_desc);
     if (error != ESP_OK) {
       ESP_LOGE(TAG, "SPI transmission error: %s", esp_err_to_name(error));
@@ -95,7 +95,7 @@ double calcIrms_with_mcp3208(int numberOfSamples) {
   uint16_t sampleI = 0;
   double sumI = 0;
 
-  for (int n = 0; n < numberOfSamples; n++) {
+  for (int n = 0; n <= numberOfSamples; n++) {
     sampleI = spi_read();
 
     offsetI = (offsetI + (sampleI - offsetI) / 1024);
@@ -118,7 +118,7 @@ void app_main() {
   initializeSPI();
 
   while (1) {
-    double Irms_main = calcIrms_with_mcp3208(10);
+    double Irms_main = calcIrms_with_mcp3208(1);
     ESP_LOGI("mcp320x", "Current: %f mA", Irms_main);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
