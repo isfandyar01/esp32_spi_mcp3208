@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "freertos.h": "c",
-        "numeric": "c"
+        "numeric": "c",
+        "mcp320x_isf.h": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM6",

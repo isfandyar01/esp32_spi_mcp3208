@@ -1,7 +1,5 @@
 
-
 #include "esp_log.h"
-#include "esp_types.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "mcp320x_isf.h"
@@ -18,7 +16,10 @@ double filteredI;
 double sqV, sumV, sqI, sumI, instP, sumP;
 double realPower, apparentPower, powerFactor, Vrms;
 
-static uint16_t spi_read() {
+// Declare the SPI bus and device handles as global variables
+static spi_device_handle_t spi2;
+
+static void initializeSPI() {
   esp_err_t ret;
 
   spi_bus_config_t buscfg = {
@@ -31,8 +32,6 @@ static uint16_t spi_read() {
 
   ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
   ESP_ERROR_CHECK(ret);
-
-  spi_device_handle_t spi2;
 
   spi_device_interface_config_t dev_config;
   dev_config.address_bits = 0;
@@ -51,13 +50,18 @@ static uint16_t spi_read() {
   dev_config.post_cb = NULL;
 
   ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &dev_config, &spi2));
+}
 
+static void releaseSPI() {
+  ESP_ERROR_CHECK(spi_bus_remove_device(spi2));
+  ESP_ERROR_CHECK(spi_bus_free(SPI2_HOST));
+}
+
+static uint16_t spi_read() {
   uint16_t value = 0;
   uint32_t sum = 0;
   char data[3];
   char rxdata[3];
-  // spi_transaction_t transaction = {
-  //     .flags = SPI_TRANS_USE_RXDATA | SPI_TRANS_USE_TXDATA, .length = 24};
 
   spi_transaction_t trans_desc;
   trans_desc.addr = 0;
@@ -65,7 +69,6 @@ static uint16_t spi_read() {
   trans_desc.flags = SPI_TRANS_USE_RXDATA;
   trans_desc.length = 3 * 8;
   trans_desc.rxlength = 3 * 8;
-  // trans_desc.rx_buffer = data;
 
   trans_desc.tx_data[0] = (uint8_t)((1 << 2) | (MCP320X_READ_MODE_SINGLE << 1) |
                                     ((MCP320X_CHANNEL_0 & 4) >> 2));
@@ -73,17 +76,20 @@ static uint16_t spi_read() {
   trans_desc.tx_data[2] = 0;
 
   for (uint16_t i = 0; i < 3000; i++) {
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi2, &trans_desc));
+    esp_err_t error = spi_device_polling_transmit(spi2, &trans_desc);
+    if (error != ESP_OK) {
+      ESP_LOGE(TAG, "SPI transmission error: %s", esp_err_to_name(error));
+      break;
+    }
     const uint16_t first_part = trans_desc.rx_data[1];
     const uint16_t second_part = trans_desc.rx_data[2];
 
     sum += ((first_part & 15) << 8) | second_part;
   }
-  ESP_ERROR_CHECK(spi_bus_remove_device(spi2));
-  ESP_ERROR_CHECK(spi_bus_free(SPI2_HOST));
+
   value = (uint16_t)(sum / 2000);
   return value;
-};
+}
 
 double calcIrms_with_mcp3208(int numberOfSamples) {
   uint16_t sampleI = 0;
@@ -95,10 +101,7 @@ double calcIrms_with_mcp3208(int numberOfSamples) {
     offsetI = (offsetI + (sampleI - offsetI) / 1024);
     filteredI = sampleI - offsetI;
 
-    // Root-mean-square method current
-    // 1) square current values
     sqI = filteredI * filteredI;
-    // 2) sum
     sumI += sqI;
   }
 
@@ -111,11 +114,15 @@ double calcIrms_with_mcp3208(int numberOfSamples) {
 }
 
 void app_main() {
+  // Initialize the SPI bus
+  initializeSPI();
 
   while (1) {
-
     double Irms_main = calcIrms_with_mcp3208(10);
     ESP_LOGI("mcp320x", "Current: %f mA", Irms_main);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
+
+  // Release the SPI bus when done
+  releaseSPI();
 }
