@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
 #define NUMBER_OF_SAMPLES 1048
 
 static const char *TAG = "current_sensor";
@@ -60,34 +64,36 @@ static void releaseSPI() {
 static uint16_t spi_read() {
   uint16_t value = 0;
   uint32_t sum = 0;
-  char data[3];
-  char rxdata[3];
+  char data[3] = "";
+  char recvbuf[3] = "";
 
   spi_transaction_t trans_desc;
+  memset(&trans_desc, 0, sizeof(trans_desc));
   trans_desc.addr = 0;
   trans_desc.cmd = 0;
-  trans_desc.flags = SPI_TRANS_USE_RXDATA;
-  trans_desc.length = 3 * 8;
+  trans_desc.flags = 0;
+  trans_desc.length = 128;
   trans_desc.rxlength = 3 * 8;
+  trans_desc.tx_buffer = data;
+  trans_desc.rx_buffer = recvbuf;
 
-  trans_desc.tx_data[0] = (uint8_t)((1 << 2) | (MCP320X_READ_MODE_SINGLE << 1) |
-                                    ((MCP320X_CHANNEL_0 & 4) >> 2));
-  trans_desc.tx_data[1] = (uint8_t)(MCP320X_CHANNEL_0 << 6);
-  trans_desc.tx_data[2] = 0;
+  data[0] = (uint8_t)((1 << 2) | (MCP320X_READ_MODE_SINGLE << 1) |
+                      ((MCP320X_CHANNEL_0 & 4) >> 2));
+  data[1] = (uint8_t)(MCP320X_CHANNEL_0 << 6);
+  data[2] = 0;
 
-  for (uint16_t i = 0; i <= 1; i++) {
+  for (uint16_t i = 0; i <= 2000; i++) {
     esp_err_t error = spi_device_polling_transmit(spi2, &trans_desc);
     if (error != ESP_OK) {
       ESP_LOGE(TAG, "SPI transmission error: %s", esp_err_to_name(error));
       break;
     }
-    const uint16_t first_part = trans_desc.rx_data[1];
-    const uint16_t second_part = trans_desc.rx_data[2];
-
-    sum += ((first_part & 15) << 8) | second_part;
+    value = (uint16_t)((recvbuf[1] << 8) | recvbuf[2]);
+    sum += value;
   }
 
   value = (uint16_t)(sum / 2000);
+
   return value;
 }
 
@@ -118,11 +124,9 @@ void app_main() {
   initializeSPI();
 
   while (1) {
-    double Irms_main = calcIrms_with_mcp3208(1);
+    double Irms_main = calcIrms_with_mcp3208(1000);
     ESP_LOGI("mcp320x", "Current: %f mA", Irms_main);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
-
-  // Release the SPI bus when done
   releaseSPI();
 }
