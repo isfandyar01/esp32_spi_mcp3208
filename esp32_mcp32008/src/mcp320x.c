@@ -1,5 +1,6 @@
 #include "mcp320x.h"
 #include "assertion.h"
+#include "freertos/task.h"
 #include "log.h"
 
 /**
@@ -24,22 +25,17 @@ mcp320x_t *mcp320x_install(mcp320x_config_t const *config) {
   CMP_CHECK((config->clock_speed_hz >= MCP320X_CLOCK_MIN_HZ),
             "clock speed error(<MCP320X_CLOCK_MIN_HZ)", NULL)
 
-  spi_device_interface_config_t dev_cfg = {
-      .address_bits = 0,
-      .command_bits = 0,
-      .dummy_bits = 0,
-      .mode = 0,
-      .duty_cycle_pos = 0,
-      .cs_ena_posttrans = 0,
-      .cs_ena_pretrans = 0,
-      .clock_speed_hz = 10 * 1000 * 1000,
-      .clock_source = SPI_CLK_SRC_DEFAULT,
-      .spics_io_num = GPIO_NUM_5,
-      .flags = SPI_DEVICE_NO_DUMMY,
-      .queue_size = 1,
-      .pre_cb = NULL,
-      .post_cb = NULL,
-  };
+  spi_device_interface_config_t dev_cfg = {.command_bits = 0,
+                                           .address_bits = 0,
+                                           .clock_speed_hz =
+                                               (int)config->clock_speed_hz,
+                                           .mode = 0,
+                                           .queue_size = 1,
+                                           .spics_io_num = config->cs_io_num,
+                                           .input_delay_ns = 0,
+                                           .pre_cb = NULL,
+                                           .post_cb = NULL,
+                                           .flags = SPI_DEVICE_NO_DUMMY};
 
   spi_device_handle_t spi_device_handle;
 

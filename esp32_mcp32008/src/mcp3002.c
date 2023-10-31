@@ -127,9 +127,13 @@ int16_t mcpReadData(MCP_t *dev, int16_t channel) {
     // B1 B0 MCP330x [IN]  00 START SGL/DIFF D2 D1 D0 DMY [OUT] -- -----
     // -------- -- -- -- --- 00 SB B11 B10 B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
     if (dev->_input == MCP_SINGLE) {
-      wbuf[0] = 0x60 | channel << 2;
+      wbuf[0] = (uint8_t)((1 << 2) | (1 << 1) | ((channel & 4) >> 2));
+      wbuf[1] = (uint8_t)(channel << 6);
+      wbuf[2] = 0;
     } else {
-      wbuf[0] = 0x40 | channel << 2;
+      wbuf[0] = (uint8_t)((1 << 2) | (0 << 1) | ((channel & 4) >> 2));
+      wbuf[1] = (uint8_t)(channel << 6);
+      wbuf[2] = 0;
     }
   } else if (dev->_model == MCP3001 || dev->_model == MCP3201 ||
              dev->_model == MCP3301) {
@@ -147,7 +151,7 @@ int16_t mcpReadData(MCP_t *dev, int16_t channel) {
     // [OUT] -- -- 00 SB B11 B10 B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
     wbuf[0] = 0x00;
   }
-  ESP_LOGD(TAG, "wbuf=0x%02X 0x%02X", wbuf[0], wbuf[1]);
+  ESP_LOGD(TAG, "wbuf=0x%02X 0x%02X 0x%02X", wbuf[0], wbuf[1], wbuf[2]);
   spi_transaction_t SPITransaction;
   esp_err_t ret;
 

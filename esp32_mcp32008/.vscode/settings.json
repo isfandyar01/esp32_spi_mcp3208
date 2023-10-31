@@ -3,7 +3,8 @@
         "freertos.h": "c",
         "numeric": "c",
         "mcp320x_isf.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "log.h": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM6",
