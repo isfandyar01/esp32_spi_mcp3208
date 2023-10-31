@@ -1,62 +1,55 @@
-
+#include "driver/gpio.h"
+#include "driver/spi_master.h"
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "mcp3002.h"
-#include "mcp320x_isf.h"
-#include <math.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "mcp320x.h"
 
-// #define TAG "MCP3208"
-#define NUMBER_OF_SAMPLES 1048
-double ICAL = 90.9;
-static const char *TAG = "current_sensor";
-static const char *VOLTTAG = " Voltage";
+void app_main(void) {
+  spi_bus_config_t bus_cfg = {.mosi_io_num = GPIO_NUM_23,
+                              .miso_io_num = GPIO_NUM_19,
+                              .sclk_io_num = GPIO_NUM_18,
+                              .quadwp_io_num = -1,
+                              .quadhd_io_num = -1,
+                              .data4_io_num = -1,
+                              .data5_io_num = -1,
+                              .data6_io_num = -1,
+                              .data7_io_num = -1,
+                              .max_transfer_sz = 3, // 24 bits.
+                              .flags = SPICOMMON_BUSFLAG_MASTER,
+                              .isr_cpu_id = INTR_CPU_ID_AUTO,
+                              .intr_flags = ESP_INTR_FLAG_LEVEL3};
 
-double offsetI = 2048;
-double filteredI;
-double sqV, sumV, sqI, sumI, instP, sumP;
-double realPower, apparentPower, powerFactor, Vrms;
-int model = MCP3208;
-// Declare the SPI bus and device handles as global variables
-static spi_device_handle_t spi2;
-MCP_t dev;
+  mcp320x_config_t mcp320x_cfg = {.host = SPI3_HOST,
+                                  .device_model = MCP3204_MODEL,
+                                  .clock_speed_hz = 1 * 1000 * 1000, // 1 Mhz.
+                                  .reference_voltage = 3300,         // 5V
+                                  .cs_io_num = GPIO_NUM_5};
 
-double calcIrms_with_mcp3208(int numberOfSamples) {
-  int sampleI = 0;
-  double sumI = 0;
+  // Bus initialization is up to the developer.
+  spi_bus_initialize(mcp320x_cfg.host, &bus_cfg, 0);
 
-  for (int n = 0; n <= numberOfSamples; n++) {
-    sampleI = mcpReadData(&dev, 7);
-    // ESP_LOGI(TAG, "Single_ended ch0 value=%d", sampleI);
-    offsetI = (offsetI + (sampleI - offsetI) / 1024);
-    filteredI = sampleI - offsetI;
+  // Add the device to the SPI bus.
+  mcp320x_t *mcp320x_handle = mcp320x_install(&mcp320x_cfg);
 
-    sqI = filteredI * filteredI;
-    sumI += sqI;
-  }
+  // Occupy the SPI bus for multiple transactions.
+  mcp320x_acquire(mcp320x_handle, portMAX_DELAY);
 
-  double I_RATIO = ICAL * ((3300 / 1000.0) / (4096));
-  double Irms = I_RATIO * sqrt(sumI / numberOfSamples);
-
-  sumI = 0;
-
-  return Irms;
-}
-
-void app_main() {
-  int16_t value;
-  // Initialize the SPI bus
-  mcpInit(&dev, model, GPIO_NUM_19, GPIO_NUM_23, GPIO_NUM_18, GPIO_NUM_5,
-          MCP_SINGLE);
-
+  u_int16_t voltage = 0;
+  double volt = 0.0;
   while (1) {
-    // double Irms_main = calcIrms_with_mcp3208(1048);
-    value = mcpReadData(&dev, 1);
-    ESP_LOGI("mcp320x", "Current: %d mA", value);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // Read voltage, sampling 1000 times.
+    mcp320x_read_voltage(mcp320x_handle, MCP320X_CHANNEL_1,
+                         MCP320X_READ_MODE_SINGLE, 1000, &voltage);
+    volt = (voltage / 1000.0);
+    ESP_LOGI("mcp320x", "Voltage: %.1f V", volt);
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
+
+  // Unoccupy the SPI bus.
+  mcp320x_release(mcp320x_handle);
+
+  // Free resources.
+  mcp320x_delete(mcp320x_handle);
+  vTaskDelay(10000 / portMAX_DELAY);
 }

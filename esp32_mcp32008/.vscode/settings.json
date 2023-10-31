@@ -4,7 +4,9 @@
         "numeric": "c",
         "mcp320x_isf.h": "c",
         "string.h": "c",
-        "log.h": "c"
+        "log.h": "c",
+        "functional": "c",
+        "rms_cal.h": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM6",
