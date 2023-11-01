@@ -7,8 +7,8 @@
 #include "esp_types.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "spi_driver.h"
 #include <stdint.h>
-
 
 #define MCP320X_RESOLUTION                                                     \
   4096 /** @brief ADC resolution = 12 bits = 2^12 = 4096 steps */
@@ -20,7 +20,7 @@
 #define MCP320X_REF_VOLTAGE_MIN                                                \
   250 /** @brief Minimum reference voltage, in mV = 250mV. */
 #define MCP320X_REF_VOLTAGE_MAX                                                \
-  7000 /** @brief Maximum reference voltage, in mV = 7000mV. The max safe      \
+  3300 /** @brief Maximum reference voltage, in mV = 7000mV. The max safe      \
           voltage is 5000mV. */
 
 /**
@@ -48,7 +48,10 @@ typedef enum {
   MCP320X_READ_MODE_SINGLE = 1
 } mcp320x_read_mode_t;
 
-uint16_t mcp_read(spi_device_handle_t spi_port, mcp320x_read_mode_t read_mode,
+uint16_t mcp_read(SPIDriver *spi, mcp320x_read_mode_t read_mode,
                   mcp320x_channel_t channel, uint16_t sample_count);
+
+double mcp_read_voltage(SPIDriver *spi, mcp320x_read_mode_t read_mode,
+                        mcp320x_channel_t channel, uint16_t sample_count);
 
 #endif // __MCP320X_H__
