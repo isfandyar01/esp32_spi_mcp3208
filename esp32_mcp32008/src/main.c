@@ -19,7 +19,7 @@ void app_main(void) {
   }
   while (1) {
     value = mcp_read_voltage(&spi, MCP320X_READ_MODE_SINGLE, MCP320X_CHANNEL_0,
-                             1000);
+                             20000);
     ESP_LOGI("mcp320x", "Current: %d mA", value);
   }
 }

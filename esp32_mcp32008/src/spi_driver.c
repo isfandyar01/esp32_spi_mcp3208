@@ -1,6 +1,8 @@
 #include "spi_driver.h"
+
 #include "stdio.h"
 #include <string.h>
+
 esp_err_t spi_driver_init(SPIDriver *spi, gpio_num_t cs_pin) {
   esp_err_t ret;
 

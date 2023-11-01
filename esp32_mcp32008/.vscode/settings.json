@@ -20,7 +20,8 @@
         "string_view": "c",
         "spi_driver.h": "c",
         "stdio.h": "c",
-        "timer_group_struct.h": "c"
+        "timer_group_struct.h": "c",
+        "timer_group_reg.h": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM6",
