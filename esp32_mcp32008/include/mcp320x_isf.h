@@ -54,4 +54,8 @@ uint16_t mcp_read(SPIDriver *spi, mcp320x_read_mode_t read_mode,
 double mcp_read_voltage(SPIDriver *spi, mcp320x_read_mode_t read_mode,
                         mcp320x_channel_t channel, uint16_t sample_count);
 
+uint16_t mcp_read_without_averaging_samples(SPIDriver *spi,
+                                            mcp320x_read_mode_t read_mode,
+                                            mcp320x_channel_t channel);
+
 #endif // __MCP320X_H__

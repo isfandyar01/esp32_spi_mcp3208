@@ -21,7 +21,12 @@
         "spi_driver.h": "c",
         "stdio.h": "c",
         "timer_group_struct.h": "c",
-        "timer_group_reg.h": "c"
+        "timer_group_reg.h": "c",
+        "esp_types.h": "c",
+        "esp_system.h": "c",
+        "spi_common.h": "c",
+        "esp_log.h": "c",
+        "spi_master.h": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.portWin": "COM6",
