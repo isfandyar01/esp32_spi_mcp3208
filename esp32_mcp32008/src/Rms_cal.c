@@ -5,13 +5,13 @@
 void init_IFX_movingRms(IFX_movingRms *mrms, uint16_t window_Len) {
 
   mrms->windown_lenght = window_Len;
-  mrms->one_divided_by_window_lenght = 1.0f / ((float)window_Len);
+  mrms->one_divided_by_window_lenght = 1.0 / ((float)window_Len);
   mrms->circular_buffer_count = 0;
 
-  for (u_int16_t i = 0; i < window_Len; i++) {
-    mrms->in_sq_L[i] = 0.0f;
+  for (uint16_t i = 0; i < window_Len; i++) {
+    mrms->in_sq_L[i] = 0.0;
   }
-  mrms->out_sq = 0.0f;
+  mrms->out_sq = 0.0;
 }
 
 float IFX_MovingRms_Update(IFX_movingRms *mrms, float in) {

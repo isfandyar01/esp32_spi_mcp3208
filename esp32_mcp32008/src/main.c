@@ -6,14 +6,14 @@
 #include "spi_driver.h"
 #include <stdio.h>
 
+IFX_movingRms RMS;
 void app_main(void) {
   double volts = 0;
   double Irms = 0;
   SPIDriver spi;
   esp_err_t ret;
-  IFX_movingRms RMS;
-
-  // init_IFX_movingRms(&RMS, 2048);
+  // IFX_movingRms RMS;
+  init_IFX_movingRms(&RMS, 2048);
 
   spi.host = SPI2_HOST;
 
